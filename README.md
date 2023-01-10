@@ -69,6 +69,7 @@ Options:
 
 Commands:
   control
+  edit
   list
 ```
 
@@ -90,4 +91,9 @@ Available Services
 ### Start a service and detach
 ```shell
 $ doxy control other-service up -- -d
+```
+
+### Edit a service
+```shell
+$ doxy edit service-2
 ```
