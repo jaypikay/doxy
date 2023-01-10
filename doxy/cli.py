@@ -33,6 +33,14 @@ def complete_service_name(ctx, param, incomplete):
 
 
 @click.command()
+@click.argument("service", nargs=1, shell_complete=complete_service_name)
+@click.pass_context
+def edit(ctx, service):
+    compose_file = services.get_compose_file(Path(ctx.obj["CONFIG"].root_directory) / service)
+    click.edit(filename=Path(compose_file))
+
+
+@click.command()
 @click.pass_context
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
@@ -42,4 +50,5 @@ def control(ctx, service, command):
 
 
 main.add_command(list)
+main.add_command(edit)
 main.add_command(control)
