@@ -3,10 +3,15 @@
 ## Installation
 
 ```shell
-pipx install git+https://git.goatpr0n.de/public/doxy.git
+pipx install git+https://github.com/jaypikay/doxy.git
 ```
 
 ## Shell completion
+
+### Service name completion
+
+By enabling shell completion the service names are *TAB-Completted* when using the `control`
+command.
 
 ### Bash
 
@@ -69,3 +74,20 @@ Commands:
 
 To add parameters to an control argument use "--" to end the *Doxy* parameter evaluation and pass
 them to *docker-compose*.
+
+## Examples
+
+### List available services
+```shell
+$ doxy list
+Available Services
+├── service-1
+├── service-2
+├── other-service
+└── my-service-demo
+```
+
+### Start a service and detach
+```shell
+$ doxy control other-service up -- -d
+```
