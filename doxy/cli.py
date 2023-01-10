@@ -1,6 +1,9 @@
 import click
 from pathlib import Path
 
+from rich import print
+from rich.tree import Tree
+
 from doxy.config import Config
 from doxy import services
 
@@ -17,7 +20,10 @@ def main(ctx):
 @click.command()
 @click.pass_context
 def list(ctx):
-    print(services.find_services(Path(ctx.obj["CONFIG"].root_directory)))
+    tree = Tree("[bold]Available Services")
+    for service in services.find_services(Path(ctx.obj["CONFIG"].root_directory)):
+        tree.add(service)
+    print(tree)
 
 
 @click.command()
