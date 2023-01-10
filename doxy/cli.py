@@ -26,9 +26,15 @@ def list(ctx):
     print(tree)
 
 
+def complete_service_name(ctx, param, incomplete):
+    config = Config()
+    config.load()
+    return [k for k in services.find_services(Path(config.root_directory)) if k.startswith(incomplete)]
+
+
 @click.command()
 @click.pass_context
-@click.argument("service", nargs=1)
+@click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
 def control(ctx, service, command):
     compose_file = services.get_compose_file(Path(ctx.obj["CONFIG"].root_directory) / service)
