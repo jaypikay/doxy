@@ -9,6 +9,7 @@ pipx install git+https://git.goatpr0n.de/public/doxy.git
 ## Shell completion
 
 ### Bash
+
 #### Alternative 1
 Add this to ~/.bashrc:
 ```
@@ -20,9 +21,11 @@ Save the script:
 ```shell
 _DOXY_COMPLETE=bash_source doxy > ~/.doxy-complete.bash
 ```
+
 Add this to ~/.bashrc:
 ```
 . ~/.foo-bar-complete.bash
+````
 
 ### Zsh
 
@@ -37,10 +40,10 @@ Save the script:
 ```shell
 _DOXY_COMPLETE=zsh_source doxy > ~/.doxy-complete.zsh
 ```
+
 Add this to ~/.zshrc:
 ```
 . ~/.foo-bar-complete.zsh
-```
 ```
 
 ## Configuration
