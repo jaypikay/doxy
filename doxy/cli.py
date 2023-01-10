@@ -1,11 +1,11 @@
-import click
 from pathlib import Path
 
+import click
 from rich import print
 from rich.tree import Tree
 
-from doxy.config import Config
 from doxy import services
+from doxy.config import Config
 
 
 @click.group()
@@ -29,14 +29,20 @@ def list(ctx):
 def complete_service_name(ctx, param, incomplete):
     config = Config()
     config.load()
-    return [k for k in services.find_services(Path(config.root_directory)) if k.startswith(incomplete)]
+    return [
+        k
+        for k in services.find_services(Path(config.root_directory))
+        if k.startswith(incomplete)
+    ]
 
 
 @click.command()
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
 def edit(ctx, service):
-    compose_file = services.get_compose_file(Path(ctx.obj["CONFIG"].root_directory) / service)
+    compose_file = services.get_compose_file(
+        Path(ctx.obj["CONFIG"].root_directory) / service
+    )
     click.edit(filename=Path(compose_file))
 
 
@@ -45,7 +51,9 @@ def edit(ctx, service):
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
 def control(ctx, service, command):
-    compose_file = services.get_compose_file(Path(ctx.obj["CONFIG"].root_directory) / service)
+    compose_file = services.get_compose_file(
+        Path(ctx.obj["CONFIG"].root_directory) / service
+    )
     services.docker_compose_command(command, compose_file)
 
 

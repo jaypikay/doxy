@@ -1,7 +1,7 @@
 import glob
-from typing import List
-from pathlib import Path
 import subprocess
+from pathlib import Path
+from typing import List
 
 import click
 
@@ -18,7 +18,7 @@ def get_compose_file(service_path: Path) -> Path:
         raise FileNotFoundError
 
 
-def docker_compose_command(commands: List[str], compose_file: Path): 
+def docker_compose_command(commands: List[str], compose_file: Path):
     ctx = click.get_current_context()
     config = ctx.obj["CONFIG"]
     cmd = [config.compose_executable, "-f", compose_file] + list(commands)
