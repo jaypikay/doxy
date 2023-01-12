@@ -24,8 +24,7 @@ def main(ctx):
 
 
 @click.command()
-@click.pass_context
-def list(ctx):
+def list():
     tree = Tree("[bold]Available Services")
     for service in services.find_services(Path(CONFIG.root_directory)):
         tree.add(service)
