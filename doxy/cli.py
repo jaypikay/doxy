@@ -8,31 +8,34 @@ from rich.tree import Tree
 from doxy import services
 from doxy.config import Config
 
+try:
+    CONFIG = Config()
+    CONFIG.load()
+except FileNotFoundError as exc:
+    click.echo(exc, sys.stderr)
+    sys.exit(1)
+
 
 @click.group()
 @click.pass_context
 def main(ctx):
     ctx.ensure_object(dict)
-    config = Config()
-    config.load()
-    ctx.obj["CONFIG"] = config
+    ctx.obj["CONFIG"] = CONFIG
 
 
 @click.command()
 @click.pass_context
 def list(ctx):
     tree = Tree("[bold]Available Services")
-    for service in services.find_services(Path(ctx.obj["CONFIG"].root_directory)):
+    for service in services.find_services(Path(CONFIG.root_directory)):
         tree.add(service)
     print(tree)
 
 
 def complete_service_name(ctx, param, incomplete):
-    config = Config()
-    config.load()
     return [
         k
-        for k in services.find_services(Path(config.root_directory))
+        for k in services.find_services(Path(CONFIG.root_directory))
         if k.startswith(incomplete)
     ]
 
@@ -48,6 +51,7 @@ def edit(ctx, service):
         click.edit(filename=Path(compose_file))
     except FileNotFoundError:
         click.echo(f"Service `{service}' not found", sys.stderr)
+        ctx.abort()
 
 
 @click.command()
@@ -62,6 +66,7 @@ def control(ctx, service, command):
         services.docker_compose_command(command, compose_file)
     except FileNotFoundError:
         click.echo(f"Service `{service}' not found", sys.stderr)
+        ctx.abort()
 
 
 main.add_command(list)

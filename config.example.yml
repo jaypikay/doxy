@@ -1,0 +1,2 @@
+root_directory: "/services/docker"
+compose_executable: "/usr/bin/docker-compose"
