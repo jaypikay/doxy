@@ -54,10 +54,14 @@ def edit(ctx, service):
         ctx.abort()
 
 
-@click.command()
-@click.pass_context
+@click.command(
+    context_settings=dict(
+        ignore_unknown_options=True,
+    )
+)
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
+@click.pass_context
 def control(ctx, service, command):
     try:
         compose_file = services.get_compose_file(
