@@ -315,14 +315,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "xdg"
-version = "5.1.1"
-description = "Variables defined by the XDG Base Directory Specification"
-category = "main"
-optional = false
-python-versions = ">=3.6,<4.0"
-
-[[package]]
 name = "yamldataclassconfig"
 version = "1.5.0"
 description = "This project helps you to import config file writen by YAML to Python data class."
@@ -337,7 +329,7 @@ pyyaml = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "170eebbe419588237954ba9ca730e93d253a3c4baba92e4a26a88eff89fce121"
+content-hash = "6bdfca3a7a9351058dae359dae3d4333b91187a9a5535eb3fc49d04ecb771c3c"
 
 [metadata.files]
 atomicwrites = []
@@ -417,5 +409,4 @@ typing-extensions = []
 typing-inspect = []
 virtualenv = []
 wcwidth = []
-xdg = []
 yamldataclassconfig = []
