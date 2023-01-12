@@ -45,9 +45,6 @@ Commands:
   list
 ```
 
-To add parameters to an control argument use "--" to end the *Doxy* parameter evaluation and pass
-them to *docker-compose*.
-
 ## Examples
 
 ### List available services
@@ -62,7 +59,7 @@ Available Services
 
 ### Start a service and detach
 ```shell
-$ doxy control other-service up -- -d
+$ doxy control other-service up -d
 ```
 
 ### Edit a service
