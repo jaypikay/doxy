@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import click
@@ -40,10 +41,13 @@ def complete_service_name(ctx, param, incomplete):
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
 def edit(ctx, service):
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
-    click.edit(filename=Path(compose_file))
+    try:
+        compose_file = services.get_compose_file(
+            Path(ctx.obj["CONFIG"].root_directory) / service
+        )
+        click.edit(filename=Path(compose_file))
+    except FileNotFoundError:
+        click.echo(f"Service `{service}' not found", sys.stderr)
 
 
 @click.command()
@@ -51,10 +55,13 @@ def edit(ctx, service):
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
 def control(ctx, service, command):
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
-    services.docker_compose_command(command, compose_file)
+    try:
+        compose_file = services.get_compose_file(
+            Path(ctx.obj["CONFIG"].root_directory) / service
+        )
+        services.docker_compose_command(command, compose_file)
+    except FileNotFoundError:
+        click.echo(f"Service `{service}' not found", sys.stderr)
 
 
 main.add_command(list)
