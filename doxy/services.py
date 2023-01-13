@@ -1,9 +1,29 @@
 import glob
 import subprocess
+import sys
+from functools import update_wrapper
 from pathlib import Path
 from typing import List
 
 import click
+
+
+def only_if_service_exists(fn):
+    def wrapper(*args, **kwargs):
+        ctx = args[0]
+        service = kwargs["service"]
+        try:
+            compose_file = get_compose_file(
+                Path(ctx.obj["CONFIG"].root_directory) / service
+            )
+            if not compose_file.exists():
+                raise FileNotFoundError()
+        except FileNotFoundError:
+            click.echo(f"Service `{service}' not found", sys.stderr)
+            ctx.abort()
+        return ctx.invoke(fn, *args, **kwargs)
+
+    return update_wrapper(wrapper, fn)
 
 
 def find_services(root: Path) -> List[str]:
