@@ -24,7 +24,7 @@ def main(ctx):
     ctx.obj["CONFIG"] = CONFIG
 
 
-@click.command()
+@click.command(help="list available services")
 def list():
     print(Rule(f"Listing services"))
     tree = Tree("[bold]Available Services")
@@ -41,7 +41,7 @@ def complete_service_name(ctx, param, incomplete):
     ]
 
 
-@click.command()
+@click.command(help="edit the compose file")
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
 @services.only_if_service_exists
@@ -56,7 +56,8 @@ def edit(ctx, service):
 @click.command(
     context_settings=dict(
         ignore_unknown_options=True,
-    )
+    ),
+    help="run docker-compose commands",
 )
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
