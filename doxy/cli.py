@@ -83,19 +83,13 @@ def update(ctx, service, remove):
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
     print(Rule(f"Updating {service}"))
-    services.docker_compose_command(
-        [
-            ["stop", "down"][remove],
-        ],
-        compose_file,
-    )
-    services.docker_compose_command(
-        [
-            "pull",
-        ],
-        compose_file,
-    )
-    services.docker_compose_command(["up", "-d"], compose_file)
+    command_chain = [
+        ["down" if remove else "stop"],
+        ["pull"],
+        ["up", "-d"],
+    ]
+    for command in command_chain:
+        services.docker_compose_command(command, compose_file)
 
 
 main.add_command(list)
