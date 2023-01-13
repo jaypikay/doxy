@@ -40,9 +40,10 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  control
-  edit
-  list
+  control  run docker-compose commands
+  edit     edit the compose file
+  list     list available services
+  update   pull the latest service images and restart
 ```
 
 ## Examples
