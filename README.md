@@ -37,6 +37,7 @@ exit 0
 Usage: doxy [OPTIONS] COMMAND [ARGS]...
 
 Options:
+  -f, --format [fancy|simple]  output formatting  [default: fancy]
   --help  Show this message and exit.
 
 Commands:
@@ -57,6 +58,8 @@ Available Services
 ├── other-service
 └── my-service-demo
 ```
+
+When `doxy -f simple` is used the output is easier to process by pipes.
 
 ### Start a service and detach
 ```shell

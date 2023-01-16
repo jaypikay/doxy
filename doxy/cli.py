@@ -6,7 +6,7 @@ from rich import print
 from rich.rule import Rule
 from rich.tree import Tree
 
-from doxy import services
+from doxy import output, services
 from doxy.config import Config
 
 try:
@@ -17,28 +17,34 @@ except FileNotFoundError as exc:
     sys.exit(1)
 
 
-@click.group()
-@click.pass_context
-def main(ctx):
-    ctx.ensure_object(dict)
-    ctx.obj["CONFIG"] = CONFIG
-
-
-@click.command(help="list available services")
-def list():
-    print(Rule(f"Listing services"))
-    tree = Tree("[bold]Available Services")
-    for service in services.find_services(Path(CONFIG.root_directory)):
-        tree.add(service)
-    print(tree)
-
-
 def complete_service_name(ctx, param, incomplete):
     return [
         k
         for k in services.find_services(Path(CONFIG.root_directory))
         if k.startswith(incomplete)
     ]
+
+
+@click.group()
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["fancy", "simple"], case_sensitive=False),
+    default="fancy",
+    show_default=True,
+    help="output formatting",
+)
+@click.pass_context
+def main(ctx, format):
+    ctx.ensure_object(dict)
+    ctx.obj["CONFIG"] = CONFIG
+    ctx.obj["FORMAT"] = format.lower()
+
+
+@click.command(help="list available services")
+@click.pass_context
+def list(ctx):
+    output.print_services(ctx, services.find_services(Path(CONFIG.root_directory)))
 
 
 @click.command(help="edit the compose file")
@@ -71,7 +77,7 @@ def control(ctx, service, command):
     services.docker_compose_command(command, compose_file)
 
 
-@click.command("update", help="pull the latest service images and restart")
+@click.command(help="pull the latest service images and restart")
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.option(
     "--remove", "-r", is_flag=True, default=False, help="remove unused volumes"
