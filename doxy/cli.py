@@ -52,7 +52,7 @@ def list(ctx):
 @click.pass_context
 @services.only_if_service_exists
 def edit(ctx, service):
-    output.print_header(f"Editing {service}")
+    output.print_header(ctx, f"Editing {service}")
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
@@ -70,7 +70,7 @@ def edit(ctx, service):
 @click.pass_context
 @services.only_if_service_exists
 def control(ctx, service, command):
-    output.print_header(f"Controlling {service}")
+    output.print_header(ctx, f"Controlling {service}")
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
