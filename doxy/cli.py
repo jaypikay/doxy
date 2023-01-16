@@ -98,7 +98,25 @@ def update(ctx, service, remove):
         services.docker_compose_command(command, compose_file)
 
 
+@click.command(help="show service status (ps, top)")
+@click.argument("service", nargs=1, shell_complete=complete_service_name)
+@click.pass_context
+@services.only_if_service_exists
+def status(ctx, service):
+    compose_file = services.get_compose_file(
+        Path(ctx.obj["CONFIG"].root_directory) / service
+    )
+    print(Rule(f"Status of {service}"))
+    command_chain = [
+        ["ps"],
+        ["top"],
+    ]
+    for command in command_chain:
+        services.docker_compose_command(command, compose_file)
+
+
 main.add_command(list)
 main.add_command(edit)
 main.add_command(control)
 main.add_command(update)
+main.add_command(status)
