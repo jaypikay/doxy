@@ -52,7 +52,7 @@ def list(ctx):
 @click.pass_context
 @services.only_if_service_exists
 def edit(ctx, service):
-    print(Rule(f"Editing {service}"))
+    output.print_header(f"Editing {service}")
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
@@ -70,7 +70,7 @@ def edit(ctx, service):
 @click.pass_context
 @services.only_if_service_exists
 def control(ctx, service, command):
-    print(Rule(f"Controlling {service}"))
+    output.print_header(f"Controlling {service}")
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
@@ -88,13 +88,13 @@ def update(ctx, service, remove):
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
-    print(Rule(f"Updating {service}"))
-    command_chain = [
-        ["down" if remove else "stop"],
-        ["pull"],
-        ["up", "-d"],
-    ]
-    for command in command_chain:
+    command_chain = {
+        f"Stopping {service}": ["down" if remove else "stop"],
+        f"Pulling {service} images": ["pull"],
+        f"Starting {service}": ["up", "-d"],
+    }
+    for title, command in command_chain.items():
+        output.print_header(ctx, title)
         services.docker_compose_command(command, compose_file)
 
 
@@ -106,12 +106,12 @@ def status(ctx, service):
     compose_file = services.get_compose_file(
         Path(ctx.obj["CONFIG"].root_directory) / service
     )
-    print(Rule(f"Status of {service}"))
-    command_chain = [
-        ["ps"],
-        ["top"],
-    ]
-    for command in command_chain:
+    command_chain = {
+        "Containers": ["ps"],
+        "Running processes": ["top"],
+    }
+    for title, command in command_chain.items():
+        output.print_header(ctx, title)
         services.docker_compose_command(command, compose_file)
 
 
