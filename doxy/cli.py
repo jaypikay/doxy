@@ -115,8 +115,6 @@ def status(ctx, service):
         services.docker_compose_command(command, compose_file)
 
 
-main.add_command(list)
-main.add_command(edit)
-main.add_command(control)
-main.add_command(update)
-main.add_command(status)
+availble_commands = (list, edit, control, update, status)
+for command in availble_commands:
+    main.add_command(command)
