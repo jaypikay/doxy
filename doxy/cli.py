@@ -2,12 +2,15 @@ import sys
 from pathlib import Path
 
 import click
-from rich import print
-from rich.rule import Rule
-from rich.tree import Tree
 
-from doxy import output, services
+from doxy import output
 from doxy.config import Config
+from doxy.services import (
+    docker_compose_command,
+    find_services,
+    get_compose_file,
+    only_if_service_exists,
+)
 
 try:
     CONFIG = Config()
@@ -20,7 +23,7 @@ except FileNotFoundError as exc:
 def complete_service_name(ctx, param, incomplete):
     return [
         k
-        for k in services.find_services(Path(CONFIG.root_directory))
+        for k in find_services(Path(CONFIG.root_directory))
         if k.startswith(incomplete)
     ]
 
@@ -44,18 +47,16 @@ def main(ctx, format):
 @click.command(help="list available services")
 @click.pass_context
 def list(ctx):
-    output.print_services(ctx, services.find_services(Path(CONFIG.root_directory)))
+    output.print_services(ctx, find_services(Path(CONFIG.root_directory)))
 
 
 @click.command(help="edit the compose file")
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
-@services.only_if_service_exists
+@only_if_service_exists
 def edit(ctx, service):
     output.print_header(ctx, f"Editing {service}")
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
     click.edit(filename=Path(compose_file))
 
 
@@ -68,13 +69,11 @@ def edit(ctx, service):
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
 @click.pass_context
-@services.only_if_service_exists
+@only_if_service_exists
 def control(ctx, service, command):
     output.print_header(ctx, f"Controlling {service}")
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
-    services.docker_compose_command(command, compose_file)
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
+    docker_compose_command(command, compose_file)
 
 
 @click.command(help="pull the latest service images and restart")
@@ -83,11 +82,9 @@ def control(ctx, service, command):
     "--remove", "-r", is_flag=True, default=False, help="remove unused volumes"
 )
 @click.pass_context
-@services.only_if_service_exists
+@only_if_service_exists
 def update(ctx, service, remove):
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
     command_chain = {
         f"Stopping {service}": ["down" if remove else "stop"],
         f"Pulling {service} images": ["pull"],
@@ -95,24 +92,22 @@ def update(ctx, service, remove):
     }
     for title, command in command_chain.items():
         output.print_header(ctx, title)
-        services.docker_compose_command(command, compose_file)
+        docker_compose_command(command, compose_file)
 
 
 @click.command(help="show service status (ps, top)")
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
-@services.only_if_service_exists
+@only_if_service_exists
 def status(ctx, service):
-    compose_file = services.get_compose_file(
-        Path(ctx.obj["CONFIG"].root_directory) / service
-    )
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
     command_chain = {
         "Containers": ["ps"],
         "Running processes": ["top"],
     }
     for title, command in command_chain.items():
         output.print_header(ctx, title)
-        services.docker_compose_command(command, compose_file)
+        docker_compose_command(command, compose_file)
 
 
 availble_commands = (list, edit, control, update, status)
