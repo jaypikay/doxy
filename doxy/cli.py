@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import click
+from click_aliases import ClickAliasedGroup
 
 from doxy import output
 from doxy.config import Config
@@ -28,7 +29,7 @@ def complete_service_name(ctx, param, incomplete):
     ]
 
 
-@click.group()
+@click.group(cls=ClickAliasedGroup)
 @click.option(
     "--format",
     "-f",
@@ -44,13 +45,13 @@ def main(ctx, format):
     ctx.obj["FORMAT"] = format.lower()
 
 
-@click.command(help="list available services")
+@main.command(help="list available services", aliases=["l", "ls"])
 @click.pass_context
 def list(ctx):
     output.print_services(ctx, find_services(Path(CONFIG.root_directory)))
 
 
-@click.command(help="edit the compose file")
+@main.command(help="edit the compose file")
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
 @only_if_service_exists
@@ -60,11 +61,12 @@ def edit(ctx, service):
     click.edit(filename=Path(compose_file))
 
 
-@click.command(
+@main.command(
     context_settings=dict(
         ignore_unknown_options=True,
     ),
     help="run docker-compose commands",
+    aliases=["c", "ctrl"],
 )
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.argument("command", nargs=-1)
@@ -76,7 +78,9 @@ def control(ctx, service, command):
     docker_compose_command(command, compose_file)
 
 
-@click.command(help="pull the latest service images and restart")
+@main.command(
+    help="pull the latest service images and restart", aliases=["upd", "sync"]
+)
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.option(
     "--remove", "-r", is_flag=True, default=False, help="remove unused volumes"
@@ -95,7 +99,7 @@ def update(ctx, service, remove):
         docker_compose_command(command, compose_file)
 
 
-@click.command(help="show service status (ps, top)")
+@main.command(help="show service status (ps, top)", aliases=["stat", "info"])
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
 @click.pass_context
 @only_if_service_exists
@@ -108,8 +112,3 @@ def status(ctx, service):
     for title, command in command_chain.items():
         output.print_header(ctx, title)
         docker_compose_command(command, compose_file)
-
-
-availble_commands = (list, edit, control, update, status)
-for command in availble_commands:
-    main.add_command(command)
