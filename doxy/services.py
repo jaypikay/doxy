@@ -41,5 +41,5 @@ def get_compose_file(service_path: Path) -> Path:
 def docker_compose_command(commands: List[str], compose_file: Path):
     ctx = click.get_current_context()
     config = ctx.obj["CONFIG"]
-    cmd = [config.compose_executable, "-f", compose_file] + list(commands)
+    cmd = config.compose_executable.split() + ["-f", compose_file] + list(commands)
     subprocess.run(cmd)
