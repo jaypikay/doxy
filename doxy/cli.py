@@ -100,16 +100,27 @@ def update(ctx, service, remove):
         docker_compose_command(command, compose_file)
 
 
-@main.command(help="show service status (ps, top)", aliases=["stat", "info"])
+@main.command(
+    help="show service status (images, ps, top, logs)", aliases=["stat", "info"]
+)
 @click.argument("service", nargs=1, shell_complete=complete_service_name)
+@click.option(
+    "--tail",
+    type=str,
+    default=10,
+    show_default=True,
+    help="Number of lines to show from the end of the logs",
+)
 @click.pass_context
 @only_if_service_exists
-def status(ctx, service):
+def status(ctx, service, tail):
     compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
-    command_chain = {
-        "Containers": ["ps"],
-        "Running processes": ["top"],
-    }
-    for title, command in command_chain.items():
+    command_chain = [
+        ("Images", ["images"]),
+        ("Containers", ["ps"]),
+        ("Running processes", ["top"]),
+        ("Log Messages", ["logs", "--tail", tail]),
+    ]
+    for title, command in command_chain:
         output.print_header(ctx, title)
         docker_compose_command(command, compose_file)
