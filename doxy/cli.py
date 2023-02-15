@@ -89,12 +89,13 @@ def control(ctx, service, command):
 @only_if_service_exists
 def update(ctx, service, remove):
     compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
-    command_chain = {
-        f"Stopping {service}": ["down" if remove else "stop"],
-        f"Pulling {service} images": ["pull"],
-        f"Starting {service}": ["up", "-d"],
-    }
-    for title, command in command_chain.items():
+    command_chain = [
+        (f"Pulling {service} images", ["pull"]),
+        (f"Starting {service}", ["up", "-d"]),
+    ]
+    if remove:
+        command_chain.insert(0, (f"Stopping {service}", ["down"]))
+    for title, command in command_chain:
         output.print_header(ctx, title)
         docker_compose_command(command, compose_file)
 
