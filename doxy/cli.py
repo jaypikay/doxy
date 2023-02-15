@@ -94,7 +94,7 @@ def update(ctx, service, remove):
         (f"Starting {service}", ["up", "-d"]),
     ]
     if remove:
-        command_chain.insert(0, (f"Stopping {service}", ["down"]))
+        command_chain.insert(0, (f"Stopping {service}", ["down", "--remove-orphans"]))
     for title, command in command_chain:
         output.print_header(ctx, title)
         docker_compose_command(command, compose_file)

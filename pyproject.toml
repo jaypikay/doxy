@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "doxy"
-version = "0.5.0"
+version = "0.5.1"
 description = ""
 authors = ["jpk <jpk@goatpr0n.de>"]
 readme = "README.md"
