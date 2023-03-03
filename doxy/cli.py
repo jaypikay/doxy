@@ -38,9 +38,18 @@ def complete_service_name(ctx, param, incomplete):
     show_default=True,
     help="output formatting",
 )
+@click.option(
+    "--service-root",
+    "-r",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    default=Path(CONFIG.root_directory),
+    help="Service root directory",
+    show_default=True,
+)
 @click.pass_context
-def main(ctx, format):
+def main(ctx, format, service_root):
     ctx.ensure_object(dict)
+    CONFIG.root_directory = service_root
     ctx.obj["CONFIG"] = CONFIG
     ctx.obj["FORMAT"] = format.lower()
 
