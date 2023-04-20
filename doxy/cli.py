@@ -24,7 +24,7 @@ except FileNotFoundError as exc:
 def complete_service_name(ctx, param, incomplete):
     return [
         k
-        for k in find_services(Path(CONFIG.root_directory))
+        for k in find_services(Path(CONFIG.root_directory), False)
         if k.startswith(incomplete)
     ]
 
@@ -55,9 +55,16 @@ def main(ctx, format, service_root):
 
 
 @main.command(help="list available services", aliases=["l", "ls"])
+@click.option(
+    "--sub-services",
+    "-s",
+    is_flag=True,
+    default=False,
+    help="list sub services from compose file",
+)
 @click.pass_context
-def list(ctx):
-    output.print_services(ctx, find_services(Path(CONFIG.root_directory)))
+def list(ctx, sub_services):
+    output.print_services(ctx, find_services(Path(CONFIG.root_directory), sub_services))
 
 
 @main.command(help="edit the compose file")
