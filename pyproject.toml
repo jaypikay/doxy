@@ -20,7 +20,7 @@ click-aliases = "^1.0.1"
 doxy = "doxy.cli:main"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^7.0.0"
 pre-commit = "^3.0.0"
 
 [build-system]
