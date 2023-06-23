@@ -54,6 +54,14 @@ def main(ctx, format, service_root):
     ctx.obj["FORMAT"] = format.lower()
 
 
+@main.command(
+    name="get-service-directory", help="get the service root directory", aliases=["dir"]
+)
+@click.pass_context
+def change_dir(ctx):
+    click.echo(ctx.obj["CONFIG"].root_directory)
+
+
 @main.command(help="list available services", aliases=["l", "ls"])
 @click.option(
     "--sub-services",
@@ -92,6 +100,15 @@ def control(ctx, service, command):
     output.print_header(ctx, f"Controlling {service}")
     compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
     docker_compose_command(command, compose_file)
+
+
+@main.command("start-all", help="start all services")
+@click.pass_context
+def start_all(ctx):
+    for service in find_services(Path(CONFIG.root_directory), False):
+        output.print_header(ctx, f"Starting {service}")
+        compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
+        docker_compose_command(["up", "-d"], compose_file)
 
 
 @main.command(
