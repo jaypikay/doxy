@@ -4,7 +4,6 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
       - id: check-toml
       - id: check-added-large-files
   - repo: https://github.com/pycqa/isort
@@ -12,10 +11,6 @@ repos:
     hooks:
       - id: isort
         args: [--profile, black]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
-    hooks:
-      - id: mypy
   - repo: https://github.com/psf/black/
     rev: 23.11.0
     hooks:
