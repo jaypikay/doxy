@@ -6,10 +6,15 @@ from click_aliases import ClickAliasedGroup
 
 from doxy import output
 from doxy.config import Config
-from doxy.services import (disable_compose_file, docker_compose_command,
-                           enable_compose_file, find_disabled_services,
-                           find_services, get_compose_file,
-                           only_if_service_exists)
+from doxy.services import (
+    disable_compose_file,
+    docker_compose_command,
+    enable_compose_file,
+    find_disabled_services,
+    find_services,
+    get_compose_file,
+    only_if_service_exists,
+)
 
 try:
     CONFIG = Config()
