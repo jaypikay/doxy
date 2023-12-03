@@ -6,8 +6,10 @@ from click_aliases import ClickAliasedGroup
 
 from doxy import output
 from doxy.config import Config
-from doxy.services import (docker_compose_command, find_services,
-                           get_compose_file, only_if_service_exists)
+from doxy.services import (disable_compose_file, docker_compose_command,
+                           enable_compose_file, find_disabled_services,
+                           find_services, get_compose_file,
+                           only_if_service_exists)
 
 try:
     CONFIG = Config()
@@ -21,6 +23,7 @@ def complete_service_name(ctx, param, incomplete):
     return [
         k
         for k in find_services(Path(CONFIG.root_directory), False)
+        + find_disabled_services(Path(CONFIG.root_directory), False)
         if k.startswith(incomplete)
     ]
 
@@ -69,6 +72,9 @@ def change_dir(ctx):
 @click.pass_context
 def list(ctx, sub_services):
     output.print_services(ctx, find_services(Path(CONFIG.root_directory), sub_services))
+    output.print_services(
+        ctx, find_disabled_services(Path(CONFIG.root_directory), sub_services), True
+    )
 
 
 @main.command(help="edit the compose file")
@@ -79,6 +85,44 @@ def edit(ctx, service):
     output.print_header(ctx, f"Editing {service}")
     compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
     click.edit(filename=str(compose_file))
+
+
+@main.command(help="disable service")
+@click.argument("service", nargs=1, shell_complete=complete_service_name)
+@click.option(
+    "--now",
+    "-n",
+    is_flag=True,
+    default=False,
+    help="shutdown service prior being disabled",
+)
+@click.pass_context
+@only_if_service_exists
+def disable(ctx, service, now):
+    output.print_header(ctx, f"Disable {service}")
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
+    if now:
+        docker_compose_command(["down", "--remove-orphans"], compose_file)
+    disable_compose_file(Path(CONFIG.root_directory) / service)
+
+
+@main.command(help="enable service")
+@click.argument("service", nargs=1, shell_complete=complete_service_name)
+@click.option(
+    "--now",
+    "-n",
+    is_flag=True,
+    default=False,
+    help="shutdown service prior being disabled",
+)
+@click.pass_context
+@only_if_service_exists
+def enable(ctx, service, now):
+    output.print_header(ctx, f"Disable {service}")
+    compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
+    enable_compose_file(Path(CONFIG.root_directory) / service)
+    if now:
+        docker_compose_command(["up", "-d"], compose_file)
 
 
 @main.command(

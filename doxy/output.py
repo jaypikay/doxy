@@ -6,9 +6,9 @@ from rich.rule import Rule
 from rich.tree import Tree
 
 
-def _print_services_fancy(services: List):
+def _print_services_fancy(services: List, status: str):
     print(Rule("Listing services"))
-    tree = Tree("[bold]Available Services")
+    tree = Tree(f"[bold]{status.capitalize()} Services")
     for service in services:
         if isinstance(service, tuple):
             compose, subservices = service
@@ -20,21 +20,25 @@ def _print_services_fancy(services: List):
     print(tree)
 
 
-def _print_services_simple(services: List[str]):
+def _print_services_simple(services: List[str], status: str):
     for service in services:
         if isinstance(service, tuple):
             compose, subservices = service
-            echo(f"{compose}\t{','.join(subservices)}")
+            echo(f"{compose}\t{','.join(subservices)} ({status})")
         else:
             echo(service)
 
 
-def print_services(ctx: Context, services: List[str]):
+def print_services(ctx: Context, services: List[str], disabled_services=False):
+    if not disabled_services:
+        status = "enabled"
+    else:
+        status = "disabled"
     match ctx.obj["FORMAT"]:
         case "fancy":
-            _print_services_fancy(services)
+            _print_services_fancy(services, status)
         case "simple":
-            _print_services_simple(services)
+            _print_services_simple(services, status)
         case _:
             echo("Unknown format choice")
 

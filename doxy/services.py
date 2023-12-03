@@ -47,8 +47,37 @@ def find_services(root: Path, sub_services: bool) -> List:
     return services
 
 
+def find_disabled_services(root: Path, sub_services: bool) -> List:
+    if not sub_services:
+        services = [
+            _.split("/")[0]
+            for _ in glob.glob("*/docker-compose.y*ml.disabled", root_dir=root)
+        ]
+    else:
+        services = []
+        for compose_file in glob.glob("*/docker-compose.y*ml.disabled", root_dir=root):
+            services.append(
+                (compose_file.split("/")[0], get_subservices(root / compose_file))
+            )
+    return services
+
+
+def disable_compose_file(service_path: Path):
+    target_path = Path(service_path / "docker-compose.yml.disabled")
+    compose_file = get_compose_file(service_path)
+    compose_file.rename(target_path)
+
+
+def enable_compose_file(service_path: Path):
+    target_path = Path(service_path / "docker-compose.yml")
+    compose_file = get_compose_file(service_path)
+    compose_file.rename(target_path)
+
+
 def get_compose_file(service_path: Path) -> Path:
     compose_files = glob.glob("docker-compose.y*ml", root_dir=service_path)
+    if len(compose_files) == 0:
+        compose_files = glob.glob("docker-compose.y*ml.disabled", root_dir=service_path)
     try:
         return service_path / compose_files[0]
     except IndexError:
