@@ -78,7 +78,7 @@ def list(ctx, sub_services):
 def edit(ctx, service):
     output.print_header(ctx, f"Editing {service}")
     compose_file = get_compose_file(Path(CONFIG.root_directory) / service)
-    click.edit(filename=Path(compose_file))
+    click.edit(filename=str(compose_file))
 
 
 @main.command(
